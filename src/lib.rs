@@ -1,16 +1,24 @@
-#[derive(Clone)]
+use std::env;
+
 struct Command {
     name: String,
     description: Option<String>,
     subcommand: Vec<Command>,
-    arg: Option<Box<Arg>>,
+    flag: Vec<Flag>,
 }
 
-#[derive(Clone)]
-struct Arg {
+struct Flag {
     name: String,
     description: Option<String>,
     short: Option<char>,
+}
+
+struct CommandParsed {
+    command: Option<String>,
+    subcommand: Option<String>,
+    flag: Option<String>,
+    value: Option<String>,
+    arg_vec: Vec<String>,
 }
 
 impl Command {
@@ -19,7 +27,7 @@ impl Command {
             name: name.to_string(),
             description: None,
             subcommand: Vec::new(),
-            arg: None,
+            flag: Vec::new(),
         }
     }
     
@@ -33,15 +41,29 @@ impl Command {
         self
     }
 
-    pub fn arg(mut self, arg: Arg) -> Self {
-        self.arg = Some(Box::new(arg));
+    pub fn flag(mut self, flag: Flag) -> Self {
+        self.flag.push(flag);
         self
+    }
+
+    pub fn get_result(self) -> CommandParsed {
+        let tokens: Vec<String> = env::args().collect();
+
+        let command = get_command_name(self, tokens);
+
+        CommandParsed {
+            command: String,
+            subcommand: Option<String>,
+            flag: Option<String>,
+            value: Option<String>,
+            arg_vec: Option<String>,
+        }
     }
 }
 
-impl Arg {
+impl Flag {
     pub fn new(name: &str) -> Self {
-        Arg {
+        Flag {
             name: name.to_string(),
             description: None,
             short: None,
@@ -59,39 +81,66 @@ impl Arg {
     }
 } 
 
+fn get_command_name(command: Command, tokens: Vec<String>) -> String {
+    if tokens[0] == command.name {
+        tokens[0].clone()
+    } else {
+        panic!("Error")
+    }
+}
+
+fn get_subcommand_name(subcommand: Command, tokens: Vec<String>) -> Option<String> {
+    for token in tokens {
+        if token == subcommand.name {
+            Some(token)
+        } else {
+            None
+        }
+    }
+
+    None
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn create_command() {
-        let matches = Command::new("linux")
+        let tokens = Command::new("linux")
             .description("Linux kernel")
             .subcommand(
                 Command::new("ls")
                 .description("List files and dirs")
-                .arg(
-                    Arg::new("a")
+                .flag(
+                    Flag::new("a")
                     .description("Show all files")
                     .short('a')
                 )
-                .arg(
-                    Arg::new("l")
+                .flag(
+                    Flag::new("l")
                     .description("Show long files")
                     .short('l')
                 )
             );
 
-        assert_eq!(matches.name, "linux");
-        assert_eq!(matches.description, Some("Linux kernel".to_string()));
+        assert_eq!(tokens.name, "linux");
+        assert_eq!(tokens.description, Some("Linux kernel".to_string()));
         assert_eq!(
-            matches.subcommand[0].name,
+            tokens.subcommand[0].name,
             "ls"
             );
         assert_eq!(
-            matches.subcommand[0].description,
+            tokens.subcommand[0].description,
             Some("List files and dirs".to_string())
             );
-        
+        assert_eq!(
+            tokens.subcommand[0].flag[0].name,
+            "a"
+        );
+        assert_eq!(
+            tokens.subcommand[0].flag[0].description,
+            Some("Show all files".to_string())
+        );
     }
 }
