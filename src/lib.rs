@@ -91,11 +91,7 @@ fn get_command_name(command: Command, tokens: Vec<String>) -> String {
 
 fn get_subcommand_name(subcommand: Command, tokens: Vec<String>) -> Option<String> {
     for token in tokens {
-        if token == subcommand.name {
-            Some(token)
-        } else {
-            None
-        }
+
     }
 
     None
