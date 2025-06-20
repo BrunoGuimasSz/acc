@@ -1,4 +1,4 @@
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub struct Flag {
     name: String,
     description: Option<String>,

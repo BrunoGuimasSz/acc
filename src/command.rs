@@ -1,7 +1,7 @@
 use crate::flag::Flag;
 use crate::parser::CommandParsed;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub struct Command {
     name: String,
     description: Option<String>,
@@ -78,7 +78,6 @@ fn get_subcommands(command: &Command, tokens: &Vec<String>) -> Option<String> {
     if tokens.len() < 2 {
         return None;
     }
-
     if command.subcommand.iter().any(|sub| sub.name == tokens[2]) {
         Some(tokens[2].to_owned())
     } else {

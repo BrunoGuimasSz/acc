@@ -1,5 +1,4 @@
-use command::command::Command;
-use command::flag::Flag;
+use command::{command::Command, flag::Flag};
 
 #[cfg(test)]
 mod tests {
