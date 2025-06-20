@@ -6,7 +6,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn full_command_build() {
+    fn full() {
         let args = Command::new("linux")
             .description("Linux kernel")
             .subcommand(
