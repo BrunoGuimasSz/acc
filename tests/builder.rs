@@ -12,12 +12,12 @@ mod tests {
                 Command::new("ls")
                 .description("List files and dirs")
                 .flag(
-                    Flag::new("a")
+                    Flag::new("all")
                     .description("Show all files")
                     .short('a')
                 )
                 .flag(
-                    Flag::new("l")
+                    Flag::new("list")
                     .description("Show long files")
                     .short('l')
                 )
@@ -34,8 +34,8 @@ mod tests {
             Some("List files and dirs")
             );
         assert_eq!(
-            args.get_subcommands()[0].get_flags()[0].get_name(),
-            "a"
+            args.get_subcommands()[0].get_flags()[0].get_long(),
+            "all"
         );
         assert_eq!(
             args.get_subcommands()[0].get_flags()[0].get_description(),

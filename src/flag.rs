@@ -1,14 +1,14 @@
 #[derive(PartialEq, Clone)]
 pub struct Flag {
-    name: String,
+    long: String,
     description: Option<String>,
     short: Option<char>,
 }
 
 impl Flag {
-    pub fn new(name: &str) -> Self {
+    pub fn new(long: &str) -> Self {
         Flag {
-            name: name.to_string(),
+            long: long.to_string(),
             description: None,
             short: None,
         }
@@ -24,8 +24,8 @@ impl Flag {
         self
     }
 
-    pub fn get_name(&self) -> &str {
-        self.name.as_str()
+    pub fn get_long(&self) -> &str {
+        self.long.as_str()
     }
 
     pub fn get_description(&self) -> Option<&str> {
@@ -35,6 +35,4 @@ impl Flag {
     pub fn get_short(&self) -> Option<char> {
         self.short
     }
-
-} 
-
+}

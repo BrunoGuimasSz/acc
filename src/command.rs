@@ -1,3 +1,4 @@
+// TODO Diminuir a quantidade de .clone()
 use crate::flag::Flag;
 use crate::parser::CommandParsed;
 
@@ -53,24 +54,24 @@ impl Command {
     pub fn parse(self, tokens: Vec<String>) -> CommandParsed {
         let command = get_command_name(&self, &tokens);
         let subcommand = get_subcommands(&self, &tokens);
-        let flags = get_flag(tokens.clone());
-        let value = get_value(tokens.clone(), &subcommand, &flags);
+        let flags = get_flag(&self, tokens.clone());
+        let value = get_value(tokens.clone(), &subcommand, flags.as_ref().unwrap());
 
         CommandParsed {
-            command: command,
+            command: command.unwrap(),
             subcommand: subcommand,
-            flag: flags,
+            flag: flags.unwrap(),
             value: value,
             arg_vec: tokens,
         }
     }
 }
 
-fn get_command_name(command: &Command, tokens: &Vec<String>) -> String {
-    if tokens[1] == command.name {
-        tokens[1].to_owned()
-    } else {
-        panic!("Error")
+fn get_command_name(command: &Command, tokens: &Vec<String>) -> Result<String, String> {
+    let cmd_name = tokens.get(1);
+    match tokens.get(1) {
+        Some(name) if name == command.get_name() => Ok(name.to_owned()),
+        _ => Err(format!("Error: Command not found: {:?}", cmd_name)),
     }
 }
 
@@ -78,6 +79,7 @@ fn get_subcommands(command: &Command, tokens: &Vec<String>) -> Option<String> {
     if tokens.len() < 2 {
         return None;
     }
+
     if command.subcommand.iter().any(|sub| sub.name == tokens[2]) {
         Some(tokens[2].to_owned())
     } else {
@@ -85,18 +87,19 @@ fn get_subcommands(command: &Command, tokens: &Vec<String>) -> Option<String> {
     }
 }
 
-fn get_flag(tokens: Vec<String>) -> Vec<String> {
-    tokens.into_iter().filter(|s| s.starts_with('-')).collect()
+// FIXME Arrumar esse metodo
+fn get_flag(command: &Command, tokens: Vec<String>) -> Result<Vec<String>, String> {
+    Ok(vec![tokens[3].clone(), tokens[4].clone()])
 }
 
-fn get_value(tokens: Vec<String>, subcommand: &Option<String>, flags: &Vec<String>) -> Option<String> {
-    let mut skip = if let Some(_sub) = subcommand { 
-        2
-    } else {
-        1
-    };
-    
-    skip += flags.len() + 1;
+fn get_value(
+    tokens: Vec<String>,
+    subcommand: &Option<String>,
+    flags: &Vec<String>,
+) -> Option<String> {
+    let mut skip = if let Some(_sub) = subcommand { 3 } else { 2 };
+
+    skip += flags.len();
 
     let value: String = tokens.into_iter().skip(skip).collect();
 
